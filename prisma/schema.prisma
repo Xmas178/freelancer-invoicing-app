@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // Use "sqlite" for local development, "postgresql" for Docker/production
+  // Switch by changing DATABASE_URL in .env file
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+// ============================================
+// AUTHENTICATION MODELS (NextAuth.js v5)
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  password      String    // Hashed with bcrypt
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  companies     Company[] // User can own multiple companies
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+
+model Company {
+  id          String   @id @default(cuid())
+  userId      String   // Link to User who owns this company
+  name        String
+  businessId  String   // Y-tunnus
+  address     String
+  city        String
+  postalCode  String
+  country     String   @default("Finland")
+  phone       String?
+  email       String
+  website     String?
+  iban        String
+  bic         String
+  vatRate     Float    @default(25.5)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoices    Invoice[]
+  customers   Customer[]
+
+  @@map("companies")
+}
+
+model Customer {
+  id          String   @id @default(cuid())
+  companyId   String   // Link to Company that owns this customer
+  name        String
+  businessId  String?
+  address     String
+  city        String
+  postalCode  String
+  country     String   @default("Finland")
+  phone       String?
+  email       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  invoices    Invoice[]
+
+  @@map("customers")
+}
+
+model Invoice {
+  id            String     @id @default(uuid())
+  invoiceNumber String     @unique @map("invoice_number")
+  companyId     String     @map("company_id")
+  customerId    String     @map("customer_id")
+  invoiceDate   DateTime   @map("invoice_date")
+  dueDate       DateTime   @map("due_date")
+  rfReference   String     @map("rf_reference")
+  subtotal      Float
+  vatAmount     Float      @map("vat_amount")
+  total         Float
+  status        String     @default("draft")
+  notes         String?
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+  company       Company    @relation(fields: [companyId], references: [id])
+  customer      Customer   @relation(fields: [customerId], references: [id])
+  lineItems     LineItem[]
+
+  @@map("invoices")
+}
+
+model LineItem {
+  id          String   @id @default(uuid())
+  invoiceId   String   @map("invoice_id")
+  description String
+  quantity    Float
+  unitPrice   Float    @map("unit_price")
+  vatRate     Float    @map("vat_rate") @default(24.0)
+  total       Float
+  order       Int
+  createdAt   DateTime @default(now()) @map("created_at")
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@map("line_items")
+}
