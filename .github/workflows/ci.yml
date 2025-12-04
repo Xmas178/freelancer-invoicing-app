@@ -31,6 +31,8 @@ jobs:
 
       - name: Generate Prisma Client
         run: npx prisma generate
+        env:
+          DATABASE_URL: "file:./dev.db"
 
       - name: Run ESLint
         run: npm run lint
@@ -40,6 +42,8 @@ jobs:
 
       - name: Prisma schema validation
         run: npx prisma validate
+        env:
+          DATABASE_URL: "file:./dev.db"
 
   # Job 2: Build Application
   build:
@@ -62,6 +66,8 @@ jobs:
 
       - name: Generate Prisma Client
         run: npx prisma generate
+        env:
+          DATABASE_URL: "file:./dev.db"
 
       - name: Build application
         run: npm run build
