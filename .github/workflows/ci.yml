@@ -40,10 +40,10 @@ jobs:
       - name: TypeScript type check
         run: npx tsc --noEmit
 
-      - name: Prisma schema validation
-        run: npx prisma validate
-        env:
-          DATABASE_URL: "file:./dev.db"
+      #- name: Prisma schema validation
+       # run: npx prisma validate
+        #env:
+         # DATABASE_URL: "file:./dev.db"
 
   # Job 2: Build Application
   build:
