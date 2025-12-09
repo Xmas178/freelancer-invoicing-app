@@ -1,9 +1,10 @@
 import { prisma } from '@/lib/db/client'
 import { notFound } from 'next/navigation'
 
-export default async function InvoiceDetailPage({ params }: { params: { id: string } }) {
+export default async function InvoiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params
     const invoice = await prisma.invoice.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
             company: true,
             customer: true,

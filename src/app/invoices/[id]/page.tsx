@@ -3,15 +3,18 @@ import DownloadPDFButton from '@/components/invoice/DownloadPDFButton'
 import { notFound } from 'next/navigation'
 
 interface PageProps {
-    params: {
+    params: Promise<{
         id: string
-    }
+    }>
 }
 
 export default async function InvoiceDetailPage({ params }: PageProps) {
+    // Await params for Next.js 15 compatibility
+    const { id } = await params
+
     // Fetch invoice with all relations
     const invoice = await prisma.invoice.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
             company: true,
             customer: true,
