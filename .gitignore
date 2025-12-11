@@ -49,4 +49,5 @@ next-env.d.ts
 Thumbs.db
 
 # Prisma
-prisma/migrations/
+prisma/migrations/prisma/*.db
+prisma/*.db-journal
