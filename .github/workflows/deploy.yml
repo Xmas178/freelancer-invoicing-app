@@ -40,10 +40,6 @@ jobs:
             echo "Waiting for containers..."
             sleep 10
 
-            echo "Running Prisma migrations..."
-            docker compose exec -T app npx prisma db push
-
-
             echo "Deployment complete!"
             docker compose ps
           EOF
