@@ -1,7 +1,3 @@
-# GitHub Actions workflow for automatic deployment to Hetzner VPS
-# Triggers on push to main branch
-# Deploys invoicing app to production server
-
 name: Deploy to Hetzner VPS
 
 on:
@@ -40,6 +36,9 @@ jobs:
 
             echo "Starting containers..."
             docker compose up -d
+
+            echo "Waiting for containers..."
+            sleep 10
 
             echo "Running Prisma migrations..."
             docker compose exec -T app npx prisma migrate deploy
