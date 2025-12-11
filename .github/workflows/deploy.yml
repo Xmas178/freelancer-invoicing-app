@@ -42,7 +42,7 @@ jobs:
             docker compose up -d
 
             echo "Running Prisma migrations..."
-            docker compose exec app npm run prisma:migrate
+            docker compose exec -T app npx prisma migrate deploy
 
             echo "Deployment complete!"
             docker compose ps
