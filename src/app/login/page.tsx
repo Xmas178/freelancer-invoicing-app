@@ -73,7 +73,7 @@ function LoginForm() {
                         Kirjaudu sisään
                     </h2>
                     <p className="mt-2 text-center text-sm text-gray-600">
-                        Or{' '}
+                        tai{' '}
                         <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
                             luo uusi tili
                         </Link>
@@ -113,7 +113,7 @@ function LoginForm() {
                                 value={formData.email}
                                 onChange={handleChange}
                                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                                placeholder="Email address"
+                                placeholder="Sähköposti"
                             />
                         </div>
 
@@ -131,7 +131,7 @@ function LoginForm() {
                                 value={formData.password}
                                 onChange={handleChange}
                                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                                placeholder="Password"
+                                placeholder="Salasana"
                             />
                         </div>
                     </div>
