@@ -1,49 +1,16 @@
-version: '3.8'
-
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:16-alpine
-    container_name: invoicing-db
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: invoicing_user
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-secure_password_change_me}
-      POSTGRES_DB: invoicing_db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5433:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U invoicing_user -d invoicing_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Next.js Application
   app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: invoicing-app
     restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://invoicing_user:${DB_PASSWORD:-secure_password_change_me}@postgres:5432/invoicing_db
-      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      NODE_ENV: production
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3001}
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
       AUTH_TRUST_HOST: "true"
     ports:
-      - "3000:3000"
-    healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-volumes:
-  postgres_data:
-    driver: local
+      - "3001:3000"
+    volumes:
+      - ./prisma:/app/prisma

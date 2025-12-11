@@ -1,6 +1,7 @@
 # Multi-stage build for Next.js application
 # Stage 1: Dependencies
-FROM node:20-alpine AS deps
+FROM node:20-slim AS deps
+RUN apt-get update -y && apt-get install -y openssl
 WORKDIR /app
 
 # Copy package files
@@ -11,7 +12,7 @@ COPY prisma ./prisma/
 RUN npm ci
 
 # Stage 2: Builder
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 WORKDIR /app
 
 # Copy dependencies from deps stage
@@ -25,7 +26,8 @@ RUN npx prisma generate
 RUN npm run build
 
 # Stage 3: Runner (production)
-FROM node:20-alpine AS runner
+FROM node:20-slim AS runner
+RUN apt-get update -y && apt-get install -y openssl
 WORKDIR /app
 
 # Set production environment
