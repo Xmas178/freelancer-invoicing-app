@@ -38,12 +38,11 @@ jobs:
             echo "Rebuilding Docker containers..."
             docker compose build --no-cache
 
-            echo "Running Prisma migrations..."
-            docker compose exec -T app npm run prisma:migrate
-
-
-            echo "Restarting containers..."
+            echo "Starting containers..."
             docker compose up -d
+
+            echo "Running Prisma migrations..."
+            docker compose exec app npm run prisma:migrate
 
             echo "Deployment complete!"
             docker compose ps
