@@ -41,7 +41,7 @@ jobs:
             sleep 10
 
             echo "Running Prisma migrations..."
-            docker compose exec -T app npx prisma db push --force-reset
+            docker compose exec -T app npm run db:push
 
             echo "Deployment complete!"
             docker compose ps
