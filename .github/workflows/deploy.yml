@@ -1,0 +1,49 @@
+# GitHub Actions workflow for automatic deployment to Hetzner VPS
+# Triggers on push to main branch
+# Deploys invoicing app to production server
+
+name: Deploy to Hetzner VPS
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup SSH
+              run: |
+                  mkdir -p ~/.ssh
+                  echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+                  chmod 600 ~/.ssh/deploy_key
+                  ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+            - name: Deploy to server
+              run: |
+                  ssh -i ~/.ssh/deploy_key \
+                      -p ${{ secrets.SSH_PORT }} \
+                      ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+
+                    cd ${{ secrets.DEPLOY_PATH }}
+
+                    echo "Pulling latest code..."
+                    git pull origin main
+
+                    echo "Rebuilding Docker containers..."
+                    docker compose build --no-cache
+
+                    echo "Running Prisma migrations..."
+                    docker compose run --rm app npx prisma migrate deploy
+
+                    echo "Restarting containers..."
+                    docker compose up -d
+
+                    echo "Deployment complete!"
+                    docker compose ps
+                  EOF
